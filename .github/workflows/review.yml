@@ -22,7 +22,6 @@ jobs:
         env:
           SERVER_URL: ${{ secrets.SERVER_URL || 'https://code-review-bot-c33c.onrender.com' }}
           WEBHOOK_SECRET: ${{ secrets.GITHUB_WEBHOOK_SECRET }}
-          EVENT_PATH: ${{ github.event_path }}
         run: |
           python - <<'PY'
           import hashlib
@@ -33,7 +32,7 @@ jobs:
           import urllib.request
 
           server_url = os.environ["SERVER_URL"].rstrip("/")
-          event_path = os.environ["EVENT_PATH"]
+          event_path = os.environ["GITHUB_EVENT_PATH"]
           webhook_secret = os.environ.get("WEBHOOK_SECRET", "")
 
           with open(event_path, "rb") as event_file:
