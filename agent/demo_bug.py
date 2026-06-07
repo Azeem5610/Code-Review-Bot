@@ -1,9 +1,13 @@
-# demo_bug.py
+def divide(a, b):
+    return a / b
 
-API_KEY = "sk-test-hardcoded-secret"
+def get_user(user_id):
+    query = "SELECT * FROM users WHERE id = " + user_id
+    return query
 
-def calculate_discount(price, discount):
-    return price / discount
+def process(data):
+    result = data["value"] * 10
+    return result
 
-def run_user_code(user_input):
-    return eval(user_input)
+def add(a, b, c, d, e, f, g, h):
+    return a + b + c + d + e + f + g + h
