@@ -1,0 +1,70 @@
+name: AI Code Review
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - ready_for_review
+      - synchronize
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  review:
+    name: Send PR to review server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send pull request payload
+        env:
+          SERVER_URL: ${{ secrets.SERVER_URL }}
+          WEBHOOK_SECRET: ${{ secrets.GITHUB_WEBHOOK_SECRET }}
+          EVENT_PATH: ${{ github.event_path }}
+        run: |
+          python - <<'PY'
+          import hashlib
+          import hmac
+          import os
+          import sys
+          import urllib.error
+          import urllib.request
+
+          server_url = os.environ["SERVER_URL"].rstrip("/")
+          event_path = os.environ["EVENT_PATH"]
+          webhook_secret = os.environ.get("WEBHOOK_SECRET", "")
+
+          with open(event_path, "rb") as event_file:
+              payload = event_file.read()
+
+          headers = {
+              "Accept": "application/json",
+              "Content-Type": "application/json",
+              "User-Agent": "code-review-bot-action",
+              "X-GitHub-Event": "pull_request",
+          }
+
+          if webhook_secret:
+              digest = hmac.new(
+                  webhook_secret.encode("utf-8"),
+                  payload,
+                  hashlib.sha256,
+              ).hexdigest()
+              headers["X-Hub-Signature-256"] = f"sha256={digest}"
+
+          request = urllib.request.Request(
+              f"{server_url}/review",
+              data=payload,
+              headers=headers,
+              method="POST",
+          )
+
+          try:
+              with urllib.request.urlopen(request, timeout=120) as response:
+                  print(response.read().decode("utf-8"))
+          except urllib.error.HTTPError as error:
+              print(error.read().decode("utf-8"), file=sys.stderr)
+              raise
+          PY
