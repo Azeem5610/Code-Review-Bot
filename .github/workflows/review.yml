@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: Send pull request payload
         env:
-          SERVER_URL: ${{ secrets.SERVER_URL }}
+          SERVER_URL: ${{ secrets.SERVER_URL || 'https://code-review-bot-c33c.onrender.com' }}
           WEBHOOK_SECRET: ${{ secrets.GITHUB_WEBHOOK_SECRET }}
           EVENT_PATH: ${{ github.event_path }}
         run: |
