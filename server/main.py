@@ -56,6 +56,39 @@ async def review(
     }
 
 
+@app.post("/test-review")
+async def test_review(payload: dict[str, Any]) -> dict[str, Any]:
+    repo_name = payload.get("repo")
+    pr_number = payload.get("pr_number")
+    token = payload.get("token")
+
+    if not repo_name or not isinstance(repo_name, str):
+        raise HTTPException(status_code=400, detail="Missing repo")
+
+    if pr_number is None:
+        raise HTTPException(status_code=400, detail="Missing pr_number")
+
+    if not token or not isinstance(token, str):
+        raise HTTPException(status_code=400, detail="Missing token")
+
+    try:
+        pr_number = int(pr_number)
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail="pr_number must be an integer") from exc
+
+    diff = fetch_pull_request_diff(repo_name, pr_number, token)
+    agent_output = run_review_agent(diff)
+    comment_summary = post_inline_comments(repo_name, pr_number, agent_output, token)
+
+    return {
+        "status": "reviewed",
+        "repo": repo_name,
+        "pr_number": pr_number,
+        "diff_size": len(diff),
+        "comments": comment_summary,
+    }
+
+
 def parse_json_body(raw_body: bytes) -> dict[str, Any]:
     try:
         payload = json.loads(raw_body.decode("utf-8"))
