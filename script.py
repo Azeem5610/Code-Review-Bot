@@ -19,4 +19,5 @@ def process(a, b, c, d, e, f, g, h):
 def read_file(path):
     f = open(path)
     content = f.read()
-    return content
+    return content 
+
