@@ -1,40 +1,22 @@
-def calculate_total(cart):
-    total = 0
-
-    for item in cart:
-        total += item["price"]
-
-    return total
+def divide_numbers(a, b):
+    return a / b
 
 
-def apply_discount(total, discount):
-    # discount is given as a percentage
-    discount_amount = total * discount
-    return total + discount_amount
+def get_user_by_id(user_id):
+    query = "SELECT * FROM users WHERE id = " + user_id
+    return query
 
 
-def get_expensive_items(items, limit):
-    expensive = []
-
-    for item in items:
-        if item["price"] < limit:
-            expensive.append(item)
-
-    return expensive
+def fetch_data(data):
+    value = data["key"] * 100
+    return value
 
 
-def calculate_average(numbers):
-    total = sum(numbers)
-    return total / len(numbers) + 1
+def process(a, b, c, d, e, f, g, h):
+    return a + b + c + d + e + f + g + h
 
 
-cart = [
-    {"name": "Keyboard", "price": 50},
-    {"name": "Mouse", "price": 30},
-]
-
-total = calculate_total(cart)
-final_price = apply_discount(total, 0.10)
-
-print("Total:", total)
-print("Final price:", final_price)
+def read_file(path):
+    f = open(path)
+    content = f.read()
+    return content
